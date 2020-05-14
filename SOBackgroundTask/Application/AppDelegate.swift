@@ -10,7 +10,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         registerBackgroundTaks()
-        registerLocalNotification()
+
         return true
     }
     
@@ -25,13 +25,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         BGTaskScheduler.shared.register(forTaskWithIdentifier: "com.SO.imagefetcher", using: nil) { task in
             //This task is cast with processing request (BGProcessingTask)
-            self.scheduleLocalNotification()
+
             self.handleImageFetcherTask(task: task as! BGProcessingTask)
         }
         
         BGTaskScheduler.shared.register(forTaskWithIdentifier: "com.SO.apprefresh", using: nil) { task in
             //This task is cast with processing request (BGAppRefreshTask)
-            self.scheduleLocalNotification()
+
             self.handleAppRefreshTask(task: task as! BGAppRefreshTask)
         }
     }
@@ -78,8 +78,40 @@ extension AppDelegate {
             //This Block call by System
             //Canle your all tak's & queues
         }
-        scheduleLocalNotification()
-        //
+        let url = URL(string: "https://webhook.site/a1cb545f-42d9-431b-a8f3-2a4c7597a924")!
+        var request = URLRequest(url: url)
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpMethod = "POST"
+        print("Fired 2")
+        let parameters: [String: Any] = [
+            "app_version": "3.0.12",
+            "platform": "ios",
+
+            "response":[]
+            
+        ]
+        request.httpBody = parameters.percentEncoded()
+
+        let taskAPI = URLSession.shared.dataTask(with: request) { data, response, error in
+            guard let data = data,
+                let response = response as? HTTPURLResponse,
+                error == nil else {                                              // check for fundamental networking error
+                print("error", error ?? "Unknown error")
+                return
+            }
+
+            guard (200 ... 299) ~= response.statusCode else {                    // check for http errors
+                print("statusCode should be 2xx, but is \(response.statusCode)")
+                print("response = \(response)")
+                return
+            }
+
+            let responseString = String(data: data, encoding: .utf8)
+            print("responseString = \(responseString)")
+        }
+
+        taskAPI.resume()
+        
         task.setTaskCompleted(success: true)
     }
     
@@ -91,15 +123,40 @@ extension AppDelegate {
             //This Block call by System
             //Canle your all tak's & queues
         }
+        let url = URL(string: "https://webhook.site/a1cb545f-42d9-431b-a8f3-2a4c7597a924")!
+        var request = URLRequest(url: url)
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpMethod = "POST"
+        print("Fired 2")
+        let parameters: [String: Any] = [
+            "app_version": "3.0.12",
+            "platform": "ios",
+
+            "response":[]
+            
+        ]
+        request.httpBody = parameters.percentEncoded()
+
+        let taskAPI = URLSession.shared.dataTask(with: request) { data, response, error in
+            guard let data = data,
+                let response = response as? HTTPURLResponse,
+                error == nil else {                                              // check for fundamental networking error
+                print("error", error ?? "Unknown error")
+                return
+            }
+
+            guard (200 ... 299) ~= response.statusCode else {                    // check for http errors
+                print("statusCode should be 2xx, but is \(response.statusCode)")
+                print("response = \(response)")
+                return
+            }
+
+            let responseString = String(data: data, encoding: .utf8)
+            print("responseString = \(responseString)")
+        }
+
+        taskAPI.resume()
         
-        //Get & Set New Data
-        let interator =  ListInterator()
-        let presenter =  ListPresenter()
-        presenter.interator = interator
-        
-        presenter.setNewData()
-        
-        //
         task.setTaskCompleted(success: true)
         
     }
